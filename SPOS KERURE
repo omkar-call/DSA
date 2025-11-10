@@ -1,0 +1,50 @@
+def findWaitingTime(processes, n, bt, wt, quantum):
+    rem_bt = bt[:]  # copy of burst times
+    t = 0  # current time
+
+    while True:
+        done = True
+
+        for i in range(n):
+            if rem_bt[i] > 0:
+                done = False
+
+                if rem_bt[i] > quantum:
+                    t += quantum
+                    rem_bt[i] -= quantum
+                else:
+                    t += rem_bt[i]
+                    wt[i] = t - bt[i]
+                    rem_bt[i] = 0
+
+        if done:
+            break
+
+
+def findTurnAroundTime(processes, n, bt, wt, tat):
+    for i in range(n):
+        tat[i] = bt[i] + wt[i]
+
+
+def findavgTime(processes, n, bt, quantum):
+    wt = [0] * n
+    tat = [0] * n
+
+    findWaitingTime(processes, n, bt, wt, quantum)
+    findTurnAroundTime(processes, n, bt, wt, tat)
+
+    print("Processes   Burst Time   Waiting Time   Turnaround Time")
+    for i in range(n):
+        print(f"{processes[i]:>9} {bt[i]:>12} {wt[i]:>15} {tat[i]:>17}")
+
+    print("\nAverage waiting time = {:.2f}".format(sum(wt) / n))
+    print("Average turnaround time = {:.2f}".format(sum(tat) / n))
+
+
+if _name_ == "_main_":
+    processes = [1, 2, 3]
+    burst_time = [10, 5, 8]
+    quantum = 2
+    n = len(processes)
+
+    findavgTime(processes, n, burst_time, quantum)
