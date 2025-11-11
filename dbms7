@@ -1,50 +1,70 @@
 USE info;
 
-CREATE TABLE borrower2 (
+DROP TABLE IF EXISTS borrower1;
+DROP TABLE IF EXISTS audit1;
+
+CREATE TABLE borrower1 (
     roll_no INT,
     name VARCHAR(20),
     date_of_issue DATE,
-    book VARCHAR(20)
+    book_name VARCHAR(30),
+    status VARCHAR(20),
+    author VARCHAR(30)
 );
 
-INSERT INTO borrower2 VALUES (1, 'nick', '2018-06-10', 'wings_of_fire', 'avaliable', 'APJ');
-INSERT INTO borrower2 VALUES (2, 'mira', '2018-05-11', 'leaves_life', 'not_avaliable', 'borwarkar');
-INSERT INTO borrower2 VALUES (3, 'rina', '2018-02-12', 'unusal', 'avaliable', 'johar');
-INSERT INTO borrower2 VALUES (4, 'harsha', '2018-06-20', 'skylimit', 'avaliable', 'ingale');
-INSERT INTO borrower2 VALUES (5, 'tej', '2018-04-20', 'highway', 'not_avaliable', 'klm');
+CREATE TABLE audit1 (
+    roll_no INT,
+    name VARCHAR(20),
+    date_of_issue DATE,
+    book_name VARCHAR(30),
+    status VARCHAR(20),
+    author VARCHAR(30),
+    ts TIMESTAMP
+);
 
-SELECT * FROM borrower1;
+INSERT INTO borrower1 VALUES
+(1, 'nick', '2018-06-10', 'wings_of_fire', 'available', 'APJ'),
+(2, 'mira', '2018-05-11', 'leaves_life', 'not_available', 'borwarkar'),
+(3, 'rina', '2018-02-12', 'unusual', 'available', 'johar'),
+(4, 'harsha', '2018-06-20', 'skylimit', 'available', 'ingale'),
+(5, 'tej', '2018-04-20', 'highway', 'not_available', 'klm');
 
 DELIMITER //
-CREATE TRIGGER library
+
+CREATE TRIGGER library_after_insert
 AFTER INSERT ON borrower1
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit1
+    INSERT INTO audit1 
     VALUES (NEW.roll_no, NEW.name, NEW.date_of_issue, NEW.book_name, NEW.status, NEW.author, CURRENT_TIMESTAMP);
 END;
 //
-DELIMITER ;
 
-INSERT INTO borrower1 VALUES (6, 'xyz', '2018-09-06', 'aaa', 'avaliable', 'xxx');
-
-SELECT * FROM borrower1;
-SELECT * FROM audit1;
-
-DELIMITER //
-CREATE TRIGGER library1
+CREATE TRIGGER library_after_update
 AFTER UPDATE ON borrower1
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit1
+    INSERT INTO audit1 
     VALUES (NEW.roll_no, NEW.name, NEW.date_of_issue, NEW.book_name, NEW.status, NEW.author, CURRENT_TIMESTAMP);
 END;
 //
+
+CREATE TRIGGER library_after_delete
+AFTER DELETE ON borrower1
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit1 
+    VALUES (OLD.roll_no, OLD.name, OLD.date_of_issue, OLD.book_name, OLD.status, OLD.author, CURRENT_TIMESTAMP);
+END;
+//
+
 DELIMITER ;
 
-UPDATE borrower1
-SET roll_no = 8, book_name = 'leaf'
-WHERE name = 'xyz';
+INSERT INTO borrower1 VALUES (6, 'xyz', '2018-09-06', 'aaa', 'available', 'xxx');
+
+UPDATE borrower1 SET roll_no = 8, book_name = 'leaf' WHERE name = 'xyz';
+
+DELETE FROM borrower1 WHERE roll_no = 8;
 
 SELECT * FROM borrower1;
 SELECT * FROM audit1;
