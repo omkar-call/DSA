@@ -1,0 +1,87 @@
+-- Use the database
+USE Abhi;
+
+-- Drop old tables if they exist (optional for re-run)
+DROP TABLE IF EXISTS marks;
+DROP TABLE IF EXISTS result;
+
+-- Create tables
+CREATE TABLE marks (
+  roll_no INT,
+  name VARCHAR(20),
+  total_marks INT
+);
+
+CREATE TABLE result (
+  roll_no INT,
+  name VARCHAR(20),
+  class VARCHAR(20)
+);
+
+-- Insert sample data
+INSERT INTO marks VALUES
+(1, 'Abhi', 1400),
+(2, 'Piyush', 980),
+(3, 'Hitesh', 880),
+(4, 'Ashley', 820),
+(5, 'Partik', 740),
+(6, 'Patil', 640);
+
+-- Set custom delimiter for procedure
+DELIMITER //
+
+-- Create stored procedure to classify grades
+CREATE PROCEDURE proc_grade(IN marks INT, OUT class VARCHAR(20))
+BEGIN
+    IF (marks <= 1500 AND marks >= 990) THEN
+        SET class = 'Distinction';
+    ELSEIF (marks <= 989 AND marks >= 900) THEN
+        SET class = 'First Class';
+    ELSEIF (marks <= 899 AND marks >= 825) THEN
+        SET class = 'Higher Second Class';
+    ELSEIF (marks <= 824 AND marks >= 750) THEN
+        SET class = 'Second Class';
+    ELSEIF (marks <= 749 AND marks >= 650) THEN
+        SET class = 'Passed';
+    ELSE
+        SET class = 'Fail';
+    END IF;
+END;
+//
+
+-- Create a function that uses the above procedure
+CREATE FUNCTION final_result(R1 INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE fmarks INT;
+    DECLARE grade VARCHAR(20);
+    DECLARE stud_name VARCHAR(20);
+
+    -- Get student details
+    SELECT total_marks, name INTO fmarks, stud_name
+    FROM marks
+    WHERE roll_no = R1;
+
+    -- Call procedure to get grade
+    CALL proc_grade(fmarks, @grade);
+
+    -- Insert into result table
+    INSERT INTO result VALUES (R1, stud_name, @grade);
+
+    RETURN R1;
+END;
+//
+
+DELIMITER ;
+
+-- Execute function for all students
+SELECT final_result(1);
+SELECT final_result(2);
+SELECT final_result(3);
+SELECT final_result(4);
+SELECT final_result(5);
+SELECT final_result(6);
+
+-- View final results
+SELECT * FROM result;
