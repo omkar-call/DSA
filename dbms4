@@ -1,5 +1,9 @@
 use Abhi;
 
+create table Borrower(roll_no int, name varchar(20), DOI date, book_name varchar(20), status varchar(20));
+
+create table Fine(roll_no int, fine_date date, amount int);
+
 delimiter //
 create procedure B(roll_new int, book_name varchar(20))
 begin
@@ -8,21 +12,24 @@ begin
     begin
         select 'NOT FOUND';
     end;
-
-    select datediff(curdate(), DOI) into X from Borrower where roll_no=roll_new;
-
-    if (X>15 && X<30) then
-        insert into Fine values(roll_new, curdate(), (X*5));
+    select datediff(curdate(), DOI) into X from Borrower where roll_no = roll_new;
+    if (X > 15 and X < 30) then
+        insert into Fine values(roll_new, curdate(), (X * 5));
     end if;
-
-    if (X>30) then
-        insert into Fine values(roll_new, curdate(), (X*50));
+    if (X > 30) then
+        insert into Fine values(roll_new, curdate(), (X * 50));
     end if;
-
-    update Borrower set status='returned' where roll_no=roll_new;
+    update Borrower set status = 'returned' where roll_no = roll_new;
 end;
 //
 delimiter ;
+
+insert into Borrower values
+(12, 'patel', '2018-07-01', 'xyz', 'issued'),
+(14, 'shinde', '2018-06-01', 'oop', 'issued'),
+(16, 'bhangale', '2018-05-01', 'coa', 'returned'),
+(18, 'rebello', '2018-06-15', 'toc', 'returned'),
+(20, 'patil', '2018-05-15', 'mp', 'issued');
 
 call B(12, 'xyz');
 call B(20, 'patil');
