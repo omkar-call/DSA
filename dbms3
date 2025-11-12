@@ -1,55 +1,97 @@
-show databases;
-use Abhi;
-show tables;
+SHOW DATABASES;
+USE Abhi;
+SHOW TABLES;
 
-create table _master(product_no int, description varchar(20), profit_per float,
-unit_measure varchar(10), quantity int, reorder int, sell_price float,
-cost_price float, primary key(product_no));
+CREATE TABLE product_master (
+    product_no INT PRIMARY KEY,
+    description VARCHAR(20),
+    profit_per FLOAT,
+    unit_measure VARCHAR(10),
+    quantity INT,
+    reorder INT,
+    sell_price FLOAT,
+    cost_price FLOAT
+);
 
-create table customer(cust_no int, cust_name varchar(20),
-cust_add varchar(20), phone_no int, primary key(cust_no));
+CREATE TABLE customer (
+    cust_no INT PRIMARY KEY,
+    cust_name VARCHAR(20),
+    cust_add VARCHAR(20),
+    phone_no BIGINT
+);
 
-create table capital(cap_no int, cap_name varchar(20),
-state_no int, primary key(cap_no));
+CREATE TABLE capital (
+    cap_no INT PRIMARY KEY,
+    cap_name VARCHAR(20),
+    state_no INT
+);
 
-create table state(state_no int, state_name varchar(20),
-state_code int, capital varchar(20), primary key(state_no));
+CREATE TABLE state (
+    state_no INT PRIMARY KEY,
+    state_name VARCHAR(20),
+    state_code INT,
+    capital VARCHAR(20)
+);
 
-insert into capital values('01','MH','01');
-insert into capital values('02','RAJ','02');
-insert into capital values('03','GOA','03');
-insert into capital values('04','GUJ','04');
-insert into capital values('05','KAR','05');
+INSERT INTO capital VALUES (1, 'MH', 1);
+INSERT INTO capital VALUES (2, 'RAJ', 2);
+INSERT INTO capital VALUES (3, 'GOA', 3);
+INSERT INTO capital VALUES (4, 'GUJ', 4);
+INSERT INTO capital VALUES (5, 'KAR', 5);
 
-insert into state values('01','MH','01','MUM');
-insert into state values('02','RAJ','02','JAI');
-insert into state values('03','GOA','03','PAN');
-insert into state values('04','GUJ','04','SUR');
-insert into state values('05','KAR','05','BAN');
+INSERT INTO state VALUES (1, 'MH', 1, 'MUM');
+INSERT INTO state VALUES (2, 'RAJ', 2, 'JAI');
+INSERT INTO state VALUES (3, 'GOA', 3, 'PAN');
+INSERT INTO state VALUES (4, 'GUJ', 4, 'SUR');
+INSERT INTO state VALUES (5, 'KAR', 5, 'BAN');
 
-select * from capital;
-select * from state;
+SELECT * FROM capital;
+SELECT * FROM state;
 
-select capital.cap_no, state.state_no from capital inner join state on capital.cap_no=state.state_no;
+SELECT capital.cap_no, state.state_no
+FROM capital
+INNER JOIN state ON capital.cap_no = state.state_no;
 
-update state set state_no="78" where state_no='1';
-update state set state_no="58" where state_no='2';
-update state set state_no="46" where state_no='3';
-update state set state_no="489" where state_no='4';
-update state set state_no="458" where state_no='5';
-insert into state values('05','MP','05','BHO');
+UPDATE state SET state_no = 78 WHERE state_no = 1;
+UPDATE state SET state_no = 58 WHERE state_no = 2;
+UPDATE state SET state_no = 46 WHERE state_no = 3;
+UPDATE state SET state_no = 489 WHERE state_no = 4;
+UPDATE state SET state_no = 458 WHERE state_no = 5;
 
-select capital.cap_no, state.state_no from capital inner join state on capital.cap_no=state.state_no;
-select capital.cap_no, state.state_no from capital left join state on capital.cap_no=state.state_no;
-select capital.cap_no, state.state_no from capital right join state on capital.cap_no=state.state_no;
+INSERT INTO state VALUES (6, 'MP', 6, 'BHO');
 
-select capital.cap_no,capital.cap_name,state.capital,state.state_no from capital inner join state on capital.cap_no=state.state_no;
-select capital.cap_no,capital.cap_name,state.capital,state.state_no from capital left join state on capital.cap_no=state.state_no;
-select capital.cap_no,capital.cap_name,state.capital,state.state_no from capital right join state on capital.cap_no=state.state_no;
+SELECT capital.cap_no, state.state_no
+FROM capital
+INNER JOIN state ON capital.cap_no = state.state_no;
 
-select * from capital c1, state s1 where c1.cap_no=s1.state_no;
-select * from capital c1, state s1 where c1.cap_no!=s1.state_no;
+SELECT capital.cap_no, state.state_no
+FROM capital
+LEFT JOIN state ON capital.cap_no = state.state_no;
 
-select * from state where state_no=(select state_no from state where state_name='MH');
-select * from state where state_no=(select state_no from state where state_name='GUJ');
-select * from state where state_no=(select capital.state_no from capital where cap_name='KAR');
+SELECT capital.cap_no, state.state_no
+FROM capital
+RIGHT JOIN state ON capital.cap_no = state.state_no;
+
+SELECT capital.cap_no, capital.cap_name, state.capital, state.state_no
+FROM capital
+INNER JOIN state ON capital.cap_no = state.state_no;
+
+SELECT capital.cap_no, capital.cap_name, state.capital, state.state_no
+FROM capital
+LEFT JOIN state ON capital.cap_no = state.state_no;
+
+SELECT capital.cap_no, capital.cap_name, state.capital, state.state_no
+FROM capital
+RIGHT JOIN state ON capital.cap_no = state.state_no;
+
+SELECT * FROM capital c1, state s1 WHERE c1.cap_no = s1.state_no;
+SELECT * FROM capital c1, state s1 WHERE c1.cap_no != s1.state_no;
+
+SELECT * FROM state 
+WHERE state_no = (SELECT state_no FROM state WHERE state_name = 'MH');
+
+SELECT * FROM state 
+WHERE state_no = (SELECT state_no FROM state WHERE state_name = 'GUJ');
+
+SELECT * FROM state 
+WHERE state_no = (SELECT state_no FROM capital WHERE cap_name = 'KAR');
